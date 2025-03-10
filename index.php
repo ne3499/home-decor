@@ -13,7 +13,7 @@
         <div class="logo">Home Decor</div>
         <nav>
             <ul>
-                <li><a href="#">Home</a></li>
+                <li><a href="index.php">Home</a></li>
                 <li><a href="#">Shop</a></li>
                 <li><a href="#">About </a></li>
                 <li><a href="#">Contact</a></li><form action="search.php" method="GET" class="search-form">
