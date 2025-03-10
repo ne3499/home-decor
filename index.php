@@ -15,7 +15,7 @@
             <ul>
                 <li><a href="#">Home</a></li>
                 <li><a href="#">Shop</a></li>
-                <li><a href="#">About</a></li>
+                <li><a href="#">About us</a></li>
                 <li><a href="#">Contact</a></li><form action="search.php" method="GET" class="search-form">
             <input type="text" name="query" placeholder=" " required>
             <button type="submit">🔍</button>
