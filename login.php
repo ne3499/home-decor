@@ -1,30 +1,30 @@
 <?php
-session_start();
 include 'db_connect.php';
+session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['name'];
+    $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $query = "SELECT * FROM users WHERE name='$username'";
+    $query = "SELECT * FROM users WHERE email='$email'";
     $result = $conn->query($query);
+    $user = $result->fetch_assoc();
 
-    if ($result->num_rows == 1) {
-        $user = $result->fetch_assoc();
-        
-        if (password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['name'] = $user['name'];
-            header("Location: home.php");
-            exit();
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['email'] = $user['email'];
+
+        if ($email === "admin@gmail.com") {
+            $_SESSION['admin_logged_in'] = true;
+            header("Location: admin.php"); // Redirect to admin page
         } else {
-            $error = "Invalid password!";
+            header("Location: user_dashboard.php"); // Redirect to user dashboard
         }
+        exit();
     } else {
-        $error = "User not found!";
+        echo "<script>alert('Invalid email or password');</script>";
     }
 }
-
 ?>
 
 

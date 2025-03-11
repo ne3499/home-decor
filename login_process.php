@@ -1,31 +1,35 @@
 <?php
+include 'db_connect.php';
 session_start();
-include('db_connect.php'); // Include database connection
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']); // Direct comparison
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-    // Fetch user from the database
-    $sql = "SELECT * FROM users WHERE LOWER(email) = LOWER('$email')";
-    $result = mysqli_query($conn, $sql);
-    $user = mysqli_fetch_assoc($result);
+    // Use prepared statements
+    $stmt = $conn->prepare("SELECT id, email, password FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+    $stmt->close();
 
-    if ($user) {
-        if ($password === $user['password']) { // Direct password comparison
-            // Store user info in session
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['name'];
+    // Direct password comparison (Not Secure)
+    if ($user !== null && $password === $user['password']) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['email'] = $user['email'];
 
-            echo "<script>alert('Login successful!'); window.location.href='index.php';</script>";
+        if ($email === "admin@gmail.com") {
+            $_SESSION['admin_logged_in'] = true;
+            header("Location: admin.php");
             exit();
         } else {
-            echo "<script>alert('Incorrect password! Try again.'); window.location.href='login.php';</script>";
+            header("Location: index.php");
             exit();
         }
     } else {
-        echo "<script>alert('Email not found! Please sign up first.'); window.location.href='signup.php';</script>";
-        exit();
+        echo "<script>alert('Invalid email or password');</script>";
     }
 }
 ?>
+.
