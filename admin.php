@@ -127,12 +127,12 @@ body {
                 <h3>🏠 Home Decor Admin</h3>
             </div>
             <ul class="list-unstyled components">
-                <li><a href="#">Dashboard</a></li>
-                <li><a href="#">Manage Products</a></li>
-                <li><a href="#">Orders</a></li>
-                <li><a href="#">Customers</a></li>
-                <li><a href="#">Settings</a></li>
-                <li><a href="#">Logout</a></li>
+                <li><a href="dashboard.php">Dashboard</a></li>
+                <li><a href="manage_products.php">Manage Products</a></li>
+                <li><a href="orders.php">Orders</a></li>
+                <li><a href="customers.php">Customers</a></li>
+                <li><a href="settings.php">Settings</a></li>
+                <li><a href="logout.php">Logout</a></li>
             </ul>
         </nav>
 
