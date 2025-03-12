@@ -1,117 +1,196 @@
 <?php
-session_start();
 include 'db_connect.php';
 
-// Check if Admin is Logged In
-if (!isset($_SESSION['admin_logged_in'])) {
-    header("Location: login.php"); 
-    exit();
-}
-
-// Handle Product Deletion
-if (isset($_GET['delete_id'])) {
-    $delete_id = $_GET['delete_id'];
-    $conn->query("DELETE FROM products WHERE id = $delete_id");
-    header("Location: admin.php");
-    exit();
-}
-
-// Fetch Products
-$result = $conn->query("SELECT * FROM products");
-
+// Fetch all products
+$products = $conn->query("SELECT * FROM products");
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    
+    <title>Admin Panel - Home Decor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 <style>
-    body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background: #f4f4f4;
+    /* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f8f8;
 }
 
-h1, h2 {
+/* Sidebar */
+#sidebar {
+    width: 250px;
+    position: fixed;
+    height: 100vh;
+    background: #343a40;
+    color: white;
+    padding-top: 20px;
+}
+
+.sidebar-header h3 {
+    text-align: center;
+    color: #ffcc00;
+}
+
+#sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+#sidebar ul li {
+    padding: 15px;
     text-align: center;
 }
 
-.add-btn {
+#sidebar ul li a {
+    text-decoration: none;
+    color: white;
     display: block;
-    margin: 10px auto;
-    width: 200px;
+    transition: 0.3s;
+}
+
+#sidebar ul li a:hover {
+    background: #ffcc00;
+    color: black;
+}
+
+/* Page Content */
+#content {
+    margin-left: 250px;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+}
+
+/* Card Style */
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card img {
+    max-width: 100%;
+    height: auto;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.card-body {
     text-align: center;
-    padding: 10px;
-    background: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+.card-title {
+    font-size: 20px;
+    font-weight: bold;
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
+.price {
+    color: #1e3a8a;
+    font-size: 18px;
+    font-weight: bold;
 }
 
-th {
-    background: #333;
-    color: white;
+/* Buttons */
+.btn-primary {
+    background: #ffcc00;
+    border: none;
+    color: black;
 }
 
-.logout-btn {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    background: red;
-    color: white;
-    padding: 5px 10px;
-    text-decoration: none;
+.btn-primary:hover {
+    background: #e6b800;
 }
 
+.btn-warning {
+    background: #ff8800;
+}
+
+.btn-danger {
+    background: #dc3545;
+}
 </style>
 <body>
-    <header>
-        <h1>Admin Dashboard</h1>
-        <a href="logout.php" class="logout-btn">Logout</a>
-    </header>
 
-    <h2>Manage Products</h2>
-    <a href="add_product.php" class="add-btn">➕ Add New Product</a>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>🏠 Home Decor Admin</h3>
+            </div>
+            <ul class="list-unstyled components">
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Manage Products</a></li>
+                <li><a href="#">Orders</a></li>
+                <li><a href="#">Customers</a></li>
+                <li><a href="#">Settings</a></li>
+                <li><a href="#">Logout</a></li>
+            </ul>
+        </nav>
 
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Category</th>
-            <th>Image</th>
-            <th>Actions</th>
-        </tr>
-        <?php while ($row = $result->fetch_assoc()): ?>
-            <tr>
-                <td><?= $row['id'] ?></td>
-                <td><?= $row['name'] ?></td>
-                <td><?= $row['description'] ?></td>
-                <td>$<?= number_format($row['price'], 2) ?></td>
-                <td><?= $row['category'] ?></td>
-                <td><img src="uploads/<?= $row['image'] ?>" width="80"></td>
-                <td>
-                    <a href="edit_product.php?id=<?= $row['id'] ?>">✏ Edit</a> | 
-                    <a href="admin.php?delete_id=<?= $row['id'] ?>" onclick="return confirm('Are you sure?')">🗑 Delete</a>
-                </td>
-            </tr>
-        <?php endwhile; ?>
-    </table>
+        <!-- Page Content -->
+        <div id="content">
+            <div class="container mt-4">
+                <h2 class="text-center mb-4">Admin Panel - Manage Products</h2>
+                
+                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addProductModal">+ Add Product</button>
+
+                <div class="row">
+                    <?php while ($product = $products->fetch_assoc()) { ?>
+                        <div class="col-md-4">
+                            <div class="card product-card">
+                                <img src="<?= $product['image'] ?>" class="card-img-top" alt="<?= $product['name'] ?>">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title"><?= $product['name'] ?></h5>
+                                    <p class="card-text price">$<?= $product['price'] ?></p>
+                                    <a href="edit_product.php?id=<?= $product['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="delete_product.php?id=<?= $product['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
+
+            <!-- Add Product Modal -->
+            <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add a New Product</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="add_product.php" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Product Name</label>
+                                    <input type="text" class="form-control" name="name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Price</label>
+                                    <input type="number" step="0.01" class="form-control" name="price" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="image" class="form-label">Image</label>
+                                    <input type="file" class="form-control" name="image" required>
+                                </div>
+                                <button type="submit" class="btn btn-success">Add Product</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
