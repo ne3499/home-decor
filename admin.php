@@ -128,7 +128,7 @@ body {
             </div>
             <ul class="list-unstyled components">
                 <li><a href="dashboard.php">Dashboard</a></li>
-                <li><a href="manage_products.php">Manage Products</a></li>
+                <li><a href="products.php">Manage Products</a></li>
                 <li><a href="orders.php">Orders</a></li>
                 <li><a href="customers.php">Customers</a></li>
                 <li><a href="settings.php">Settings</a></li>
