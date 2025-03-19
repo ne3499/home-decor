@@ -32,27 +32,6 @@ header {
     font-weight: bold;
 }
 
-nav ul {
-    list-style: none;
-    display: flex;
-    padding: 0;
-    margin: 0;
-}
-
-nav ul li {
-    margin-left: 20px;
-}
-
-nav ul li a {
-    text-decoration: none;
-    color: #fff;
-    font-size: 18px;
-    transition: 0.3s;
-}
-
-nav ul li a:hover {
-    color: #ffcc00;
-}
 
 /* About Section */
 .about-container {
@@ -100,17 +79,8 @@ footer {
     <!-- Navigation Bar -->
     <header>
         <div class="logo">Home Decor</div>
-        <nav>
-            <ul>
-                <li><a href="index.php">Home</a></li>
-                <li><a href="about.php">About</a></li>
-                <li><a href="store.php">Store</a></li>
-                <li><a href="cart.php" class="cart">🛒 Cart</a></li>
-                <li><a href="service.php">Service</a></li>
-                <li><a href="contact.php">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
+        <?php include 'navbar.php'; ?>
+        </header>
 <br>
 <br>
 <br>

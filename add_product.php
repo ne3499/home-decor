@@ -4,99 +4,61 @@ include 'db_connect.php';
 $message = ""; // To store success or error messages
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['name'];
-    $description = $_POST['description'];
-    $price = $_POST['price'];
-    $category = $_POST['category'];
+    // Check if all fields exist in the form submission
+    $name = $_POST['name'] ?? '';
+    $description = $_POST['description'] ?? '';
+    $price = $_POST['price'] ?? '';
+    $category = $_POST['category'] ?? '';
     $created_at = date("Y-m-d H:i:s");
 
-    // Ensure the uploads directory exists
-    $imagePath = "uploads/";
-    if (!is_dir($imagePath)) {
-        mkdir($imagePath, 0777, true); // Create the directory if it does not exist
-    }
-
-    $image = "";
-    if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-        $imageName = time() . "_" . basename($_FILES['image']['name']);
-        $imageFullPath = $imagePath . $imageName;
-
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $imageFullPath)) {
-            $image = $imageFullPath;
-        } else {
-            $message = "Failed to upload image.";
-        }
-    }
-
-
-    // Insert into database
-    $stmt = $conn->prepare("INSERT INTO products (name, description, price, category, image, created_at) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssdsss", $name, $description, $price, $category, $image, $created_at);
-
-    if ($stmt->execute()) {
-        $message = "Product added successfully!";
+    // Ensure required fields are not empty
+    if (empty($name) || empty($description) || empty($price) || empty($category)) {
+        $message = "Please fill in all required fields.";
     } else {
-        $message = "Error adding product: " . $stmt->error;
+        // Ensure the uploads directory exists
+        $imagePath = "uploads/";
+        if (!is_dir($imagePath)) {
+            mkdir($imagePath, 0777, true); // Create the directory if it does not exist
+        }
+
+        $image = "";
+        if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+            $imageName = time() . "_" . basename($_FILES['image']['name']);
+            $imageFullPath = $imagePath . $imageName;
+
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $imageFullPath)) {
+                $image = $imageFullPath;
+            } else {
+                $message = "Failed to upload image.";
+            }
+        }
+
+        // Insert into database only if image is uploaded successfully
+        if (!empty($image)) {
+            $stmt = $conn->prepare("INSERT INTO products (name, description, price, category, image, created_at) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssdsss", $name, $description, $price, $category, $image, $created_at);
+
+            if ($stmt->execute()) {
+                $message = "Product added successfully!";
+            } else {
+                $message = "Error adding product: " . $stmt->error;
+            }
+        } else {
+            $message = "Image upload failed. Product not added.";
+        }
     }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Product</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="add_product.css"> <!-- External CSS -->
+    <link rel="stylesheet" href="add_product.css">
 </head>
-<style>
-    /* General Page Styling */
-    body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f8f9fa;
-        margin: 0;
-        padding: 0;
-    }
-
-    /* Container */
-    .container {
-        max-width: 600px;
-        margin: 50px auto;
-        background: #ffffff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Form Inputs */
-    .form-control {
-        border-radius: 5px;
-        padding: 10px;
-        border: 1px solid #ccc;
-    }
-
-    /* Buttons */
-    .btn {
-        padding: 10px;
-        border-radius: 5px;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-        border: none;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        border: none;
-    }
-
-    .btn:hover {
-        opacity: 0.9;
-    }
-</style>
 
 <body>
     <div class="container">
@@ -118,13 +80,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div class="mb-3">
-                <label for="price" class="form-label">Price ($)</label>
-                <input type="number" name="price" id="price" class="form-control" step="0.01" required>
-            </div>
+    <label for="price" class="form-label">Price </label>
+    <div class="input-group">
+        <span class="input-group-text">₹</span>
+        <input type="number" name="price" id="price" class="form-control" step="0.01" required>
+    </div>
+</div>
+
 
             <div class="mb-3">
                 <label for="category" class="form-label">Category</label>
-                <input type="text" name="category" id="category" class="form-control" required>
+                <select name="category" id="category" class="form-control" required>
+                    <option value="">Select Category</option>
+                    <option value="Living Room">Living Room</option>
+                    <option value="Bedroom">Bedroom</option>
+                    <option value="office">office</option>
+                    <option value="Kitchen">Kitchen</option>
+                </select>
             </div>
 
             <div class="mb-3">
@@ -137,5 +109,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
     </div>
 </body>
-
 </html>

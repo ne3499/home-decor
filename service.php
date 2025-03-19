@@ -131,16 +131,7 @@ footer {
     <!-- Navigation Bar -->
     <header>
         <div class="logo">Home Decor</div>
-        <nav>
-            <ul>
-                <li><a href="index.php">Home</a></li>
-                <li><a href="about.php">About</a></li>
-                <li><a href="store.php">Store</a></li>
-                <li><a href="cart.php" class="cart">🛒 Cart</a></li>
-                <li><a href="service.php">Service</a></li>
-                <li><a href="contact.php">Contact</a></li>
-            </ul>
-        </nav>
+        <?php include 'navbar.php'; ?>
     </header>
 
     <br>

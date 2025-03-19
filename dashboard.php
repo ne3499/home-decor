@@ -8,7 +8,9 @@ $totalProducts = $conn->query("SELECT COUNT(*) AS count FROM products")->fetch_a
 $totalOrders = $conn->query("SELECT COUNT(*) AS count FROM orders")->fetch_assoc()['count'];
 
 // Fetch total customers
-$totalCustomers = $conn->query("SELECT COUNT(*) AS count FROM customers")->fetch_assoc()['count'];
+// Fetch total customers (excluding admins)
+$totalCustomers = $conn->query("SELECT COUNT(*) AS count FROM users WHERE role != 'admin'")->fetch_assoc()['count'];
+
 
 // Fetch total earnings
 $totalEarnings = $conn->query("SELECT SUM(total_price) AS total FROM orders")->fetch_assoc()['total'] ?? 0;
@@ -109,42 +111,63 @@ $totalEarnings = $conn->query("SELECT SUM(total_price) AS total FROM orders")->f
         background-color: #f8f8f8;
     }
 
-    /* Sidebar */
-    #sidebar {
-        width: 250px;
-        position: fixed;
-        height: 100vh;
-        background: #343a40;
-        color: white;
-        padding-top: 20px;
-    }
+     /* Sidebar */
+        #sidebar {
+            width: 250px;
+            height: 100vh;
+            background: linear-gradient(135deg,rgb(157, 157, 159),rgb(51, 70, 116));
+            color: white;
+            padding-top: 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            transition: all 0.3s;
+        }
 
-    .sidebar-header h3 {
-        text-align: center;
-        color: #ffcc00;
-    }
+        .sidebar-header {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
 
-    #sidebar ul {
-        list-style: none;
-        padding: 0;
-    }
+        #sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
 
-    #sidebar ul li {
-        padding: 15px;
-        text-align: center;
-    }
+        #sidebar ul li {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-    #sidebar ul li a {
-        text-decoration: none;
-        color: white;
-        display: block;
-        transition: 0.3s;
-    }
+        #sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            font-size: 16px;
+            padding: 10px;
+            transition: all 0.3s;
+        }
 
-    #sidebar ul li a:hover {
-        background: #ffcc00;
-        color: black;
-    }
+        #sidebar ul li a:hover, .active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #ffcc00;
+            padding-left: 16px;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
 
     /* Page Content */
     #content {
@@ -203,25 +226,14 @@ $totalEarnings = $conn->query("SELECT SUM(total_price) AS total FROM orders")->f
     .btn-danger {
         background: #dc3545;
     }
+    
 </style>
 
 <body>
 
     <div class="wrapper">
         <!-- Sidebar -->
-        <nav id="sidebar">
-            <div class="sidebar-header">
-                <h3>🏠 Home Decor Admin</h3>
-            </div>
-            <ul class="list-unstyled components">
-                <li><a href="dashboard.php">Dashboard</a></li>
-                <li><a href="products.php">Manage Products</a></li>
-                <li><a href="orders.php">Orders</a></li>
-                <li><a href="customers.php">Customers</a></li>
-                <li><a href="settings.php">Settings</a></li>
-                <li><a href="logout.php">Logout</a></li>
-            </ul>
-        </nav>
+       <?php include("sidebar.php");?>
 
         <!-- Page Content -->
         <div id="content">
@@ -242,7 +254,7 @@ $totalEarnings = $conn->query("SELECT SUM(total_price) AS total FROM orders")->f
                     </div>
                     <div class="card bg-danger text-white">
                         <h3>Total Earnings</h3>
-                        <p>$<?php echo number_format($totalEarnings, 2); ?></p>
+                        <p>₹<?php echo number_format($totalEarnings, 2); ?></p>
 
                     </div>
                 </div>
